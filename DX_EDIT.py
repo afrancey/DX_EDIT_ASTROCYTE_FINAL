@@ -18,6 +18,8 @@ class Messages():
     def __init__(self):
         self.led_serial_message = [0,0,0] # [id, pin, value]
         self.led_OSC_message = [0,0,0] # [slave pi, address, value]
+        self.moth_serial_message = [0,0,0] #[id, pin, value]
+        self.moth_OSC_message = [0,0,0] #[slave pi, address, value]
 
 
 S = NodeSerial.NodeSerial()
@@ -109,6 +111,85 @@ slave_led_pin_dict = {'/slave/sphereUnit1/led1/in':3, '/slave/sphereUnit1/led1/o
             '/slave/sphereUnit12/led3/in':9, '/slave/sphereUnit12/led3/out':10,}
 
 
+moth_pin_dict = { '/sphereUnit1/speaker/0':9, '/sphereUnit1/speaker/1':10, '/sphereUnit1/speaker/2': 22,
+                  '/sphereUnit1/speaker/3': 23, '/sphereUnit1/speaker/4':29, '/sphereUnit1/speaker/5':30,
+                  '/sphereUnit2/speaker/0':9, '/sphereUnit2/speaker/1':10, '/sphereUnit2/speaker/2': 22,
+                  '/sphereUnit2/speaker/3': 23, '/sphereUnit2/speaker/4':29, '/sphereUnit2/speaker/5':30,
+                  '/sphereUnit3/speaker/0':9, '/sphereUnit3/speaker/1':10, '/sphereUnit3/speaker/2': 22,
+                  '/sphereUnit3/speaker/3': 23, '/sphereUnit3/speaker/4':29, '/sphereUnit3/speaker/5':30,
+                  '/sphereUnit4/speaker/0':9, '/sphereUnit4/speaker/1':10, '/sphereUnit4/speaker/2': 22,
+                  '/sphereUnit4/speaker/3': 23, '/sphereUnit4/speaker/4':29, '/sphereUnit4/speaker/5':30,
+                   '/sphereUnit5/speaker/0':9, '/sphereUnit5/speaker/1':10, '/sphereUnit5/speaker/2': 22,
+                  '/sphereUnit5/speaker/3': 23, '/sphereUnit5/speaker/4':29, '/sphereUnit5/speaker/5':30,
+                   '/sphereUnit6/speaker/0':9, '/sphereUnit6/speaker/1':10, '/sphereUnit6/speaker/2': 22,
+                  '/sphereUnit6/speaker/3': 23, '/sphereUnit6/speaker/4':29, '/sphereUnit6/speaker/5':30,
+                   '/sphereUnit7/speaker/0':9, '/sphereUnit7/speaker/1':10, '/sphereUnit7/speaker/2': 22,
+                  '/sphereUnit7/speaker/3': 23, '/sphereUnit7/speaker/4':29, '/sphereUnit7/speaker/5':30,
+                   '/sphereUnit8/speaker/0':9, '/sphereUnit8/speaker/1':10, '/sphereUnit8/speaker/2': 22,
+                  '/sphereUnit8/speaker/3': 23, '/sphereUnit8/speaker/4':29, '/sphereUnit8/speaker/5':30,
+                   '/sphereUnit9/speaker/0':9, '/sphereUnit9/speaker/1':10, '/sphereUnit9/speaker/2': 22,
+                  '/sphereUnit9/speaker/3': 23, '/sphereUnit9/speaker/4':29, '/sphereUnit9/speaker/5':30,
+                   '/sphereUnit10/speaker/0':9, '/sphereUnit10/speaker/1':10, '/sphereUnit10/speaker/2': 22,
+                  '/sphereUnit10/speaker/3': 23, '/sphereUnit10/speaker/4':29, '/sphereUnit10/speaker/5':30,
+                   '/sphereUnit11/speaker/0':9, '/sphereUnit11/speaker/1':10, '/sphereUnit11/speaker/2': 22,
+                  '/sphereUnit11/speaker/3': 23, '/sphereUnit11/speaker/4':29, '/sphereUnit11/speaker/5':30,
+                  '/sphereUnit12/speaker/0':9, '/sphereUnit12/speaker/1':10, '/sphereUnit12/speaker/2': 22,
+                  '/sphereUnit12/speaker/3': 23, '/sphereUnit12/speaker/4':29, '/sphereUnit12/speaker/5':30,
+                '/sphereUnit1/A/7':22, '/sphereUnit1/B/10':6, '/sphereUnit1/C/7':20, '/sphereUnit1/C/8':16,
+                '/sphereUnit2/A/7':22, '/sphereUnit2/B/10':6, '/sphereUnit2/C/7':20, '/sphereUnit2/C/8':20,
+                '/sphereUnit3/A/7':22, '/sphereUnit3/B/10':6, '/sphereUnit3/C/7':20, '/sphereUnit3/C/8':16,
+                '/sphereUnit4/A/7':22, '/sphereUnit4/B/10':6, '/sphereUnit4/C/7':20, '/sphereUnit4/C/8':16,
+                '/sphereUnit5/A/7':22, '/sphereUnit5/B/10':6, '/sphereUnit5/C/7':20, '/sphereUnit5/C/8':20,
+                '/sphereUnit6/A/7':22, '/sphereUnit6/B/10':6, '/sphereUnit6/C/7':20, '/sphereUnit6/C/8':16,
+                '/sphereUnit7/A/7':22, '/sphereUnit7/B/10':6, '/sphereUnit7/C/7':20, '/sphereUnit7/C/8':16,
+                '/sphereUnit8/A/7':22, '/sphereUnit8/B/10':6, '/sphereUnit8/C/7':20, '/sphereUnit8/C/8':20,
+                '/sphereUnit9/A/7':22, '/sphereUnit9/B/10':6, '/sphereUnit9/C/7':20, '/sphereUnit9/C/8':16,
+                '/sphereUnit10/A/7':22, '/sphereUnit10/B/10':6, '/sphereUnit10/C/7':20, '/sphereUnit10/C/8':16,
+                '/sphereUnit11/A/7':22, '/sphereUnit11/B/10':6, '/sphereUnit11/C/7':20, '/sphereUnit11/C/8':20,
+                '/sphereUnit12/A/7':22, '/sphereUnit12/B/10':6, '/sphereUnit12/C/7':20, '/sphereUnit12/C/8':16,
+                }
+
+slave_moth_pin_dict = { '/slave/sphereUnit1/speaker/0':9, '/slave/sphereUnit1/speaker/1':10, '/slave/sphereUnit1/speaker/2': 22,
+                  '/slave/sphereUnit1/speaker/3': 23, '/slave/sphereUnit1/speaker/4':29, '/slave/sphereUnit1/speaker/5':30,
+                  '/slave/sphereUnit2/speaker/0':9, '/slave/sphereUnit2/speaker/1':10, '/slave/sphereUnit2/speaker/2': 22,
+                  '/slave/sphereUnit2/speaker/3': 23, '/slave/sphereUnit2/speaker/4':29, '/slave/sphereUnit2/speaker/5':30,
+                  '/slave/sphereUnit3/speaker/0':9, '/slave/sphereUnit3/speaker/1':10, '/slave/sphereUnit3/speaker/2': 22,
+                  '/slave/sphereUnit3/speaker/3': 23, '/slave/sphereUnit3/speaker/4':29, '/slave/sphereUnit3/speaker/5':30,
+                  '/slave/sphereUnit4/speaker/0':9, '/slave/sphereUnit4/speaker/1':10, '/slave/sphereUnit4/speaker/2': 22,
+                  '/slave/sphereUnit4/speaker/3': 23, '/slave/sphereUnit4/speaker/4':29, '/slave/sphereUnit4/speaker/5':30,
+                   '/slave/sphereUnit5/speaker/0':9, '/slave/sphereUnit5/speaker/1':10, '/slave/sphereUnit5/speaker/2': 22,
+                  '/slave/sphereUnit5/speaker/3': 23, '/slave/sphereUnit5/speaker/4':29, '/slave/sphereUnit5/speaker/5':30,
+                   '/slave/sphereUnit6/speaker/0':9, '/slave/sphereUnit6/speaker/1':10, '/slave/sphereUnit6/speaker/2': 22,
+                  '/slave/sphereUnit6/speaker/3': 23, '/slave/sphereUnit6/speaker/4':29, '/slave/sphereUnit6/speaker/5':30,
+                   '/slave/sphereUnit7/speaker/0':9, '/slave/sphereUnit7/speaker/1':10, '/slave/sphereUnit7/speaker/2': 22,
+                  '/slave/sphereUnit7/speaker/3': 23, '/slave/sphereUnit7/speaker/4':29, '/slave/sphereUnit7/speaker/5':30,
+                   '/slave/sphereUnit8/speaker/0':9, '/slave/sphereUnit8/speaker/1':10, '/slave/sphereUnit8/speaker/2': 22,
+                  '/slave/sphereUnit8/speaker/3': 23, '/slave/sphereUnit8/speaker/4':29, '/slave/sphereUnit8/speaker/5':30,
+                   '/slave/sphereUnit9/speaker/0':9, '/slave/sphereUnit9/speaker/1':10, '/slave/sphereUnit9/speaker/2': 22,
+                  '/slave/sphereUnit9/speaker/3': 23, '/slave/sphereUnit9/speaker/4':29, '/slave/sphereUnit9/speaker/5':30,
+                   '/slave/sphereUnit10/speaker/0':9, '/slave/sphereUnit10/speaker/1':10, '/slave/sphereUnit10/speaker/2': 22,
+                  '/slave/sphereUnit10/speaker/3': 23, '/slave/sphereUnit10/speaker/4':29, '/slave/sphereUnit10/speaker/5':30,
+                   '/slave/sphereUnit11/speaker/0':9, '/slave/sphereUnit11/speaker/1':10, '/slave/sphereUnit11/speaker/2': 22,
+                  '/slave/sphereUnit11/speaker/3': 23, '/slave/sphereUnit11/speaker/4':29, '/slave/sphereUnit11/speaker/5':30,
+                  '/slave/sphereUnit12/speaker/0':9, '/slave/sphereUnit12/speaker/1':10, '/slave/sphereUnit12/speaker/2': 22,
+                  '/slave/sphereUnit12/speaker/3': 23, '/slave/sphereUnit12/speaker/4':29, '/slave/sphereUnit12/speaker/5':30,
+                        
+                  '/slave/sphereUnit1/A/7':22, '/slave/sphereUnit1/B/10':6, '/slave/sphereUnit1/C/7':20, '/slave/sphereUnit1/C/8':16,
+                '/slave/sphereUnit2/A/7':22, '/slave/sphereUnit2/B/10':6, '/slave/sphereUnit2/C/7':20, '/slave/sphereUnit2/C/8':20,
+                '/slave/sphereUnit3/A/7':22, '/slave/sphereUnit3/B/10':6, '/slave/sphereUnit3/C/7':20, '/slave/sphereUnit3/C/8':16,
+                '/slave/sphereUnit4/A/7':22, '/slave/sphereUnit4/B/10':6, '/slave/sphereUnit4/C/7':20, '/slave/sphereUnit4/C/8':16,
+                '/slave/sphereUnit5/A/7':22, '/slave/sphereUnit5/B/10':6, '/slave/sphereUnit5/C/7':20, '/slave/sphereUnit5/C/8':20,
+                '/slave/sphereUnit6/A/7':22, '/slave/sphereUnit6/B/10':6, '/slave/sphereUnit6/C/7':20, '/slave/sphereUnit6/C/8':16,
+                '/slave/sphereUnit7/A/7':22, '/slave/sphereUnit7/B/10':6, '/slave/sphereUnit7/C/7':20, '/slave/sphereUnit7/C/8':16,
+                '/slave/sphereUnit8/A/7':22, '/slave/sphereUnit8/B/10':6, '/slave/sphereUnit8/C/7':20, '/slave/sphereUnit8/C/8':20,
+                '/slave/sphereUnit9/A/7':22, '/slave/sphereUnit9/B/10':6, '/slave/sphereUnit9/C/7':20, '/slave/sphereUnit9/C/8':16,
+                '/slave/sphereUnit10/A/7':22, '/slave/sphereUnit10/B/10':6, '/slave/sphereUnit10/C/7':20, '/slave/sphereUnit10/C/8':16,
+                '/slave/sphereUnit11/A/7':22, '/slave/sphereUnit11/B/10':6, '/slave/sphereUnit11/C/7':20, '/slave/sphereUnit11/C/8':20,
+                '/slave/sphereUnit12/A/7':22, '/slave/sphereUnit12/B/10':6, '/slave/sphereUnit12/C/7':20, '/slave/sphereUnit12/C/8':16,
+                        
+                }
+
+
 RPi_s2 = [1,2,3] #master
 RPi_s5 = [4,5,6] #slave
 RPi_s8 = [7,8,9] #slave
@@ -159,6 +240,39 @@ if __name__ == '__main__':
         led = int(addr[addr.index('led') + 3])
         pin = slave_led_pin_dict[addr]
         messages.led_serial_message = [unit - 1 + 12, pin, value]
+
+
+
+    def moth_handler_master(addr, value):
+        print("addr: " + addr)            
+
+        # parse unit number from address
+        s = addr[addr.index('Unit') + 4:]
+        unit = int(s[:s.index('/')])
+        
+        pin = moth_pin_dict[addr]
+
+        if unit in RPi_s2:
+            messages.moth_serial_message = [unit - 1, pin, value]
+        elif unit in RPi_s5:
+            messages.moth_OSC_message = ['s5', '/slave' + addr, value]
+        elif unit in RPi_s8:
+            messages.moth_OSC_message = ['s8', '/slave' + addr, value]
+        elif unit in RPi_s11:
+            messages.moth_OSC_message = ['s11', '/slave' + addr, value]
+            
+            
+
+    def moth_handler_slave(addr, value):
+        print("addr: " + addr)
+        
+        # parse unit number from address
+        s = addr[addr.index('Unit') + 4:]
+        unit = int(s[:s.index('/')])
+
+        # parse led number
+        pin = slave_moth_pin_dict[addr]
+        messages.moth_serial_message = [unit - 1, pin, value]
         
                 
     dispatcher = dispatcher.Dispatcher()
@@ -170,6 +284,14 @@ if __name__ == '__main__':
     for key in slave_led_pin_dict.keys():
                 
         dispatcher.map(key, led_handler_slave)
+
+    for key in moth_pin_dict.keys():
+                
+        dispatcher.map(key, moth_handler_master)
+        
+    for key in slave_moth_pin_dict.keys():
+                
+        dispatcher.map(key, moth_handler_slave)
 
     OSC_listener = osc_server.ThreadingOSCUDPServer(('0.0.0.0', 3001), dispatcher)
     OSC_listener_thread = threading.Thread(target=OSC_listener.serve_forever)
@@ -202,6 +324,27 @@ if __name__ == '__main__':
                 slave_s11.send_message(messages.led_OSC_message[1], messages.led_OSC_message[2])
 
             messages.led_OSC_message = [0,0,0]
+            print('OSC message sent')
+
+        if messages.moth_serial_message != [0,0,0]:
+            for ser in S.serial_list:
+                print('sending: ' + str(messages.moth_serial_message[0]) + ', ' + str(messages.moth_serial_message[1]) + ', ' + str(messages.moth_serial_message[2]))
+                ser.write(b'\xff')
+                ser.write(bytes([messages.moth_serial_message[0]]))
+                ser.write(bytes([messages.moth_serial_message[1]]))
+                ser.write(bytes([messages.moth_serial_message[2]]))
+            messages.moth_serial_message = [0,0,0]
+            print('serial message sent')
+
+        if messages.moth_OSC_message != [0,0,0]:
+            if messages.moth_OSC_message[0] == 's5':
+                slave_s5.send_message(messages.moth_OSC_message[1], messages.moth_OSC_message[2])
+            if messages.moth_OSC_message[0] == 's8':
+                slave_s8.send_message(messages.moth_OSC_message[1], messages.moth_OSC_message[2])
+            if messages.moth_OSC_message[0] == 's11':
+                slave_s11.send_message(messages.moth_OSC_message[1], messages.moth_OSC_message[2])
+
+            messages.moth_OSC_message = [0,0,0]
             print('OSC message sent')
             
             

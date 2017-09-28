@@ -1,3 +1,4 @@
+#include <SoftPWM.h>
 
 // System Info
 int NumSphereUnits = 12;
@@ -10,10 +11,16 @@ long int perimeter_teensy_identifiers[12] = {245753, 245744, 258663, 259514, 258
 
 int RS_pins[6] = {3,4,25,32,9,10};
 
+                    //center              
+int moth_pins[10] = {9, 10, 22, 23, 29, 30, 22, 20, 6, 16};
+
+int SoftPWM_pins[3] = {29, 30, 16};
+
 // Teensy ID
 // filled with read_EE(), read_teensyID()
 static uint8_t teensyID[8];
 long int myID;
+int my_type; //0 = center, 1 = perimeter
 
 
 // node number
@@ -22,12 +29,20 @@ uint8_t my_number;
 int TESTPIN_LED = 13;
 
 void setup() {
+  SoftPWMBegin(SOFTPWM_NORMAL);
   Serial.begin(57600);
   myID = read_teensyID();
   my_number = get_my_number(myID);
-  
-  for (int i = 0; i < 6; i++){
-    pinMode(RS_pins[i], OUTPUT);
+  my_type = get_my_type(myID);
+
+  if (my_type == 1){
+    for (int i = 0; i < 6; i++){
+      pinMode(RS_pins[i], OUTPUT);
+    }
+  } else {
+    for (int i = 0; i < 10; i++){
+      pinMode(moth_pins[i], OUTPUT);
+    }
   }
 
   delay(1000);
@@ -53,7 +68,12 @@ void loop() {
       uint8_t incomingValue = Serial.read();
 
       if (incomingNumber == my_number){
-        analogWrite(incomingPin, incomingValue);
+
+        if (incomingPin == SoftPWM_pins[0] || incomingPin == SoftPWM_pins[1] || incomingPin == SoftPWM_pins[2]){
+          SoftPWMSet(incomingPin, incomingValue);
+        } else {
+          analogWrite(incomingPin, incomingValue);
+        }
       }
 
      }
@@ -103,4 +123,22 @@ int get_my_number(long int myID){
   }
 
   return my_number;
+}
+
+int get_my_type(long int myID){
+  int my_type;
+
+  // first check centre spars
+  for (uint8_t unit = 0x00; unit < NumSphereUnits; unit+= 0x01){
+    if (center_teensy_identifiers[unit] == myID){
+      my_type = 0;
+      Serial.print(unit);
+    }
+    if (perimeter_teensy_identifiers[unit] == myID){
+      my_type = 1;
+      Serial.print(unit);
+    }
+  }
+
+  return my_type;
 }
