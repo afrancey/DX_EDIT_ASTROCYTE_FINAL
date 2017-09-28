@@ -16,6 +16,21 @@ int moth_pins[10] = {9, 10, 22, 23, 29, 30, 22, 20, 6, 16};
 
 int SoftPWM_pins[3] = {29, 30, 16};
 
+int sampling_rate = 100;
+long last_sample_time = millis();
+int IR_pin = 17;
+int IR_threshold = 1100;
+
+long last_message_time = millis();
+long idle_wait_time = 15000; //15 seconds
+bool idle_state = false;
+int idle_state_stage = 0;
+int max_brightness = 75;
+bool idle_increasing = true;
+int idle_rate = 10;
+long last_stage_change = millis();
+long idle_random_light = random(3);
+
 // Teensy ID
 // filled with read_EE(), read_teensyID()
 static uint8_t teensyID[8];
@@ -45,16 +60,49 @@ void setup() {
     }
   }
 
+  pinMode(IR_pin, INPUT);
+
   delay(1000);
+
+  last_sample_time = millis();
+  last_message_time = millis();
+
+  
 
 
 }
 
 void loop() {
 
+
+  if (millis() - last_message_time > idle_wait_time){
+    if (millis() - last_stage_change > idle_rate){
+      last_stage_change = millis();
+
+      if (idle_state_stage == 0){      
+        idle_increasing = true;
+        idle_random_light = random(3);
+      } else if (idle_state_stage == 50) {
+        idle_increasing = false;
+      }
+
+      analogWrite(RS_pins[idle_random_light*2], idle_state_stage);
+      
+  
+      if (idle_increasing){
+        idle_state_stage++;
+      } else {
+        idle_state_stage--;
+      }
+    }
+    
+  }
+
   // see if we are receiving a message
   uint8_t incomingByte;
   uint8_t commandByte = 0xff;
+  int IR_val;
+  
 
   if (Serial.available() > 3){
     
@@ -69,6 +117,8 @@ void loop() {
 
       if (incomingNumber == my_number){
 
+        last_message_time = millis();
+
         if (incomingPin == SoftPWM_pins[0] || incomingPin == SoftPWM_pins[1] || incomingPin == SoftPWM_pins[2]){
           SoftPWMSet(incomingPin, incomingValue);
         } else {
@@ -78,7 +128,17 @@ void loop() {
 
      }
 
-    } 
+    }
+
+    if (my_number == 1 || my_number == 4 || my_number == 7 || my_number == 10){
+      IR_val = analogRead(IR_pin);
+      if (IR_val > IR_threshold){
+        Serial.write(0xff);
+      }
+    }
+
+
+ 
 
 }
 

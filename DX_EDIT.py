@@ -200,6 +200,8 @@ s8_ip = '10.1.19.16'
 s11_ip = '10.1.19.17'
 
 
+laptop_4d_ip = '1.2.3.4'
+
 if __name__ == '__main__':
 
     # Object to hold messages, avoids getting blocked by OSC handlers
@@ -301,6 +303,8 @@ if __name__ == '__main__':
     slave_s5 = udp_client.SimpleUDPClient(s5_ip, 3001)
     slave_s8 = udp_client.SimpleUDPClient(s8_ip, 3001)
     slave_s11 = udp_client.SimpleUDPClient(s11_ip, 3001)
+    laptop_4d = udp_client.SimpleUDPClient(laptop_4d_ip, 3000)
+    
 
     print("Starting Main Program")
 
@@ -346,6 +350,14 @@ if __name__ == '__main__':
 
             messages.moth_OSC_message = [0,0,0]
             print('OSC message sent')
+
+
+        for ser in S.serial_list:
+            if ser.inWaiting() > 0:
+                laptop_4d.send_message('/bang', 0)
+                print('IR bang sent')
+                
+                
             
             
 
