@@ -13,15 +13,6 @@ from pythonosc import udp_client
 from pythonosc import dispatcher
 from pythonosc import osc_server
 
-
-class Messages():
-    def __init__(self):
-        self.led_serial_message = [0,0,0] # [id, pin, value]
-        self.led_OSC_message = [0,0,0] # [slave pi, address, value]
-        self.moth_serial_message = [0,0,0] #[id, pin, value]
-        self.moth_OSC_message = [0,0,0] #[slave pi, address, value]
-
-
 S = NodeSerial.NodeSerial()
 
 #Instruction Message Codes
@@ -204,9 +195,6 @@ laptop_4d_ip = '1.2.3.4'
 
 if __name__ == '__main__':
 
-    # Object to hold messages, avoids getting blocked by OSC handlers
-    messages = Messages()
-
     # OSC handlers
     def led_handler_master(addr, value):
         print("addr: " + addr)
@@ -214,20 +202,27 @@ if __name__ == '__main__':
         # parse unit number from address
         s = addr[addr.index('Unit') + 4:]
         unit = int(s[:s.index('/')])
-
-        # parse led number
-        led = int(addr[addr.index('led') + 3])
         
         pin = led_pin_dict[addr]
 
         if unit in RPi_s2:
-            messages.led_serial_message = [unit - 1 + 12, pin, value]
+            teensy_number = unit - 1 + 12
+            for ser in S.serial_list:
+                print('sending: ' + str(teensy_number) + ', ' + str(pin) + ', ' + str(value))
+                ser.write(b'\xff')
+                ser.write(bytes([teensy_number]))
+                ser.write(bytes([pin]))
+                ser.write(bytes([value]))
+            print('serial message sent')
         elif unit in RPi_s5:
-            messages.led_OSC_message = ['s5', '/slave' + addr, value]
+            slave_s5.send_message('/slave' + addr, value)
+            print('OSC message sent')
         elif unit in RPi_s8:
-            messages.led_OSC_message = ['s8', '/slave' + addr, value]
+            slave_s8.send_message('/slave' + addr, value)
+            print('OSC message sent')
         elif unit in RPi_s11:
-            messages.led_OSC_message = ['s11', '/slave' + addr, value]
+            slave_s11.send_message('/slave' + addr, value)
+            print('OSC message sent')
             
             
 
@@ -238,10 +233,15 @@ if __name__ == '__main__':
         s = addr[addr.index('Unit') + 4:]
         unit = int(s[:s.index('/')])
 
-        # parse led number
-        led = int(addr[addr.index('led') + 3])
         pin = slave_led_pin_dict[addr]
-        messages.led_serial_message = [unit - 1 + 12, pin, value]
+        teensy_number = unit - 1 + 12
+        for ser in S.serial_list:
+            print('sending: ' + str(teensy_number) + ', ' + str(pin) + ', ' + str(value))
+            ser.write(b'\xff')
+            ser.write(bytes([teensy_number]))
+            ser.write(bytes([pin]))
+            ser.write(bytes([value]))
+        print('serial message sent')
 
 
 
@@ -255,13 +255,23 @@ if __name__ == '__main__':
         pin = moth_pin_dict[addr]
 
         if unit in RPi_s2:
-            messages.moth_serial_message = [unit - 1, pin, value]
+            teensy_number = unit - 1
+            for ser in S.serial_list:
+                print('sending: ' + str(teensy_number) + ', ' + str(pin) + ', ' + str(value))
+                ser.write(b'\xff')
+                ser.write(bytes([teensy_number]))
+                ser.write(bytes([pin]))
+                ser.write(bytes([value]))
+            print('serial message sent')
         elif unit in RPi_s5:
-            messages.moth_OSC_message = ['s5', '/slave' + addr, value]
+            slave_s5.send_message('/slave' + addr, value)
+            print('OSC message sent')
         elif unit in RPi_s8:
-            messages.moth_OSC_message = ['s8', '/slave' + addr, value]
+            slave_s8.send_message('/slave' + addr, value)
+            print('OSC message sent')
         elif unit in RPi_s11:
-            messages.moth_OSC_message = ['s11', '/slave' + addr, value]
+            slave_s11.send_message('/slave' + addr, value)
+            print('OSC message sent')
             
             
 
@@ -274,7 +284,14 @@ if __name__ == '__main__':
 
         # parse led number
         pin = slave_moth_pin_dict[addr]
-        messages.moth_serial_message = [unit - 1, pin, value]
+        teensy_number = unit - 1
+        for ser in S.serial_list:
+            print('sending: ' + str(teensy_number) + ', ' + str(pin) + ', ' + str(value))
+            ser.write(b'\xff')
+            ser.write(bytes([teensy_number]))
+            ser.write(bytes([pin]))
+            ser.write(bytes([value]))
+        print('serial message sent')
         
                 
     dispatcher = dispatcher.Dispatcher()
@@ -295,7 +312,7 @@ if __name__ == '__main__':
                 
         dispatcher.map(key, moth_handler_slave)
 
-    OSC_listener = osc_server.ThreadingOSCUDPServer(('0.0.0.0', 3001), dispatcher)
+    OSC_listener = osc_server.ForkingOSCUDPServer(('0.0.0.0', 3001), dispatcher)
     OSC_listener_thread = threading.Thread(target=OSC_listener.serve_forever)
     OSC_listener_thread.start()
 
@@ -309,48 +326,6 @@ if __name__ == '__main__':
     print("Starting Main Program")
 
     while True:
-        if messages.led_serial_message != [0,0,0]:
-            for ser in S.serial_list:
-                print('sending: ' + str(messages.led_serial_message[0]) + ', ' + str(messages.led_serial_message[1]) + ', ' + str(messages.led_serial_message[2]))
-                ser.write(b'\xff')
-                ser.write(bytes([messages.led_serial_message[0]]))
-                ser.write(bytes([messages.led_serial_message[1]]))
-                ser.write(bytes([messages.led_serial_message[2]]))
-            messages.led_serial_message = [0,0,0]
-            print('serial message sent')
-
-        if messages.led_OSC_message != [0,0,0]:
-            if messages.led_OSC_message[0] == 's5':
-                slave_s5.send_message(messages.led_OSC_message[1], messages.led_OSC_message[2])
-            if messages.led_OSC_message[0] == 's8':
-                slave_s8.send_message(messages.led_OSC_message[1], messages.led_OSC_message[2])
-            if messages.led_OSC_message[0] == 's11':
-                slave_s11.send_message(messages.led_OSC_message[1], messages.led_OSC_message[2])
-
-            messages.led_OSC_message = [0,0,0]
-            print('OSC message sent')
-
-        if messages.moth_serial_message != [0,0,0]:
-            for ser in S.serial_list:
-                print('sending: ' + str(messages.moth_serial_message[0]) + ', ' + str(messages.moth_serial_message[1]) + ', ' + str(messages.moth_serial_message[2]))
-                ser.write(b'\xff')
-                ser.write(bytes([messages.moth_serial_message[0]]))
-                ser.write(bytes([messages.moth_serial_message[1]]))
-                ser.write(bytes([messages.moth_serial_message[2]]))
-            messages.moth_serial_message = [0,0,0]
-            print('serial message sent')
-
-        if messages.moth_OSC_message != [0,0,0]:
-            if messages.moth_OSC_message[0] == 's5':
-                slave_s5.send_message(messages.moth_OSC_message[1], messages.moth_OSC_message[2])
-            if messages.moth_OSC_message[0] == 's8':
-                slave_s8.send_message(messages.moth_OSC_message[1], messages.moth_OSC_message[2])
-            if messages.moth_OSC_message[0] == 's11':
-                slave_s11.send_message(messages.moth_OSC_message[1], messages.moth_OSC_message[2])
-
-            messages.moth_OSC_message = [0,0,0]
-            print('OSC message sent')
-
 
         for ser in S.serial_list:
             if ser.inWaiting() > 0:
