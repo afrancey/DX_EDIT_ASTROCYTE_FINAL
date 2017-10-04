@@ -22,14 +22,17 @@ int IR_pin = 17;
 int IR_threshold = 1100;
 
 long last_message_time = millis();
-long idle_wait_time = 15000; //15 seconds
+long idle_wait_time = 20000; //2 seconds
 bool idle_state = false;
 int idle_state_stage = 0;
-int max_brightness = 75;
+int max_brightness = 50;
 bool idle_increasing = true;
-int idle_rate = 10;
+int idle_rate = 100;
 long last_stage_change = millis();
 long idle_random_light = random(3);
+long idle_random_moth_1 = random(6);
+long idle_random_moth_2 = random(6);
+bool idling_on = false;
 
 // Teensy ID
 // filled with read_EE(), read_teensyID()
@@ -42,6 +45,8 @@ int my_type; //0 = center, 1 = perimeter
 uint8_t my_number;
 
 int TESTPIN_LED = 13;
+
+bool serial_on = true;
 
 void setup() {
   SoftPWMBegin(SOFTPWM_NORMAL);
@@ -75,18 +80,28 @@ void setup() {
 void loop() {
 
 
-  if (millis() - last_message_time > idle_wait_time){
+  if (millis() - last_message_time > idle_wait_time && idling_on){
     if (millis() - last_stage_change > idle_rate){
       last_stage_change = millis();
+
+      if (idle_state_stage <= max_brightness){
+
+        if (my_type == 1){
+          safe_write(RS_pins[idle_random_light*2], idle_state_stage);
+        } else {
+          safe_write(moth_pins[idle_random_moth_1], idle_state_stage);
+          safe_write(moth_pins[idle_random_moth_2], idle_state_stage);
+        }
+      }
 
       if (idle_state_stage == 0){      
         idle_increasing = true;
         idle_random_light = random(3);
+        idle_random_moth_1 = random(6);
+        idle_random_moth_2 = random(6);
       } else if (idle_state_stage == 50) {
         idle_increasing = false;
       }
-
-      analogWrite(RS_pins[idle_random_light*2], idle_state_stage);
       
   
       if (idle_increasing){
@@ -104,7 +119,7 @@ void loop() {
   int IR_val;
   
 
-  if (Serial.available() > 3){
+  if (Serial.available() > 3 && serial_on){
     
     incomingByte = Serial.read();
 
@@ -118,12 +133,7 @@ void loop() {
       if (incomingNumber == my_number){
 
         last_message_time = millis();
-
-        if (incomingPin == SoftPWM_pins[0] || incomingPin == SoftPWM_pins[1] || incomingPin == SoftPWM_pins[2]){
-          SoftPWMSet(incomingPin, incomingValue);
-        } else {
-          analogWrite(incomingPin, incomingValue);
-        }
+        safe_write(incomingPin, incomingValue);
       }
 
      }
@@ -201,4 +211,22 @@ int get_my_type(long int myID){
   }
 
   return my_type;
+}
+
+void safe_write(uint8_t incomingPin, uint8_t val){
+
+  uint8_t incomingValue;
+
+  if (val > 50){
+    incomingValue = 0;
+  } else {
+    incomingValue = val;
+  }
+  
+  if (incomingPin == SoftPWM_pins[0] || incomingPin == SoftPWM_pins[1] || incomingPin == SoftPWM_pins[2]){
+    SoftPWMSet(incomingPin, incomingValue);
+  } else {
+    analogWrite(incomingPin, incomingValue);
+  }
+  
 }
