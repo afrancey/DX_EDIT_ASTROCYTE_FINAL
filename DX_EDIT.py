@@ -20,6 +20,8 @@ INSTRUCT_CODE_GET_TEENSY_ID = b'\x00'
 INSTRUCT_CODE_ACTIVATE_LED = b'\xAA'
 ##INSTRUCT_CODE_PLAY_SD_WAV = b'\x0F'
 
+COMMAND_BYTE = b'\xff'
+
 
 
 #######################################################################################
@@ -209,7 +211,7 @@ if __name__ == '__main__':
             teensy_number = unit - 1 + 12
             for ser in S.serial_list:
                 print('sending: ' + str(teensy_number) + ', ' + str(pin) + ', ' + str(value))
-                ser.write(b'\xff')
+                ser.write(COMMAND_BYTE)
                 ser.write(bytes([teensy_number]))
                 ser.write(bytes([pin]))
                 ser.write(bytes([value]))
@@ -237,7 +239,7 @@ if __name__ == '__main__':
         teensy_number = unit - 1 + 12
         for ser in S.serial_list:
             print('sending: ' + str(teensy_number) + ', ' + str(pin) + ', ' + str(value))
-            ser.write(b'\xff')
+            ser.write(COMMAND_BYTE)
             ser.write(bytes([teensy_number]))
             ser.write(bytes([pin]))
             ser.write(bytes([value]))
@@ -258,7 +260,7 @@ if __name__ == '__main__':
             teensy_number = unit - 1
             for ser in S.serial_list:
                 print('sending: ' + str(teensy_number) + ', ' + str(pin) + ', ' + str(value))
-                ser.write(b'\xff')
+                ser.write(COMMAND_BYTE)
                 ser.write(bytes([teensy_number]))
                 ser.write(bytes([pin]))
                 ser.write(bytes([value]))
@@ -287,7 +289,7 @@ if __name__ == '__main__':
         teensy_number = unit - 1
         for ser in S.serial_list:
             print('sending: ' + str(teensy_number) + ', ' + str(pin) + ', ' + str(value))
-            ser.write(b'\xff')
+            ser.write(COMMAND_BYTE)
             ser.write(bytes([teensy_number]))
             ser.write(bytes([pin]))
             ser.write(bytes([value]))
@@ -296,23 +298,19 @@ if __name__ == '__main__':
                 
     dispatcher = dispatcher.Dispatcher()
 
-    for key in led_pin_dict.keys():
-                
+    for key in led_pin_dict.keys():       
         dispatcher.map(key, led_handler_master)
         
-    for key in slave_led_pin_dict.keys():
-                
+    for key in slave_led_pin_dict.keys():         
         dispatcher.map(key, led_handler_slave)
 
-    for key in moth_pin_dict.keys():
-                
+    for key in moth_pin_dict.keys():          
         dispatcher.map(key, moth_handler_master)
         
-    for key in slave_moth_pin_dict.keys():
-                
+    for key in slave_moth_pin_dict.keys():     
         dispatcher.map(key, moth_handler_slave)
 
-    OSC_listener = osc_server.ForkingOSCUDPServer(('0.0.0.0', 3001), dispatcher)
+    OSC_listener = osc_server.BlockingOSCUDPServer(('0.0.0.0', 3001), dispatcher)
     OSC_listener_thread = threading.Thread(target=OSC_listener.serve_forever)
     OSC_listener_thread.start()
 
@@ -325,18 +323,11 @@ if __name__ == '__main__':
 
     print("Starting Main Program")
 
-    while True:
+    count = 0
 
+    while True:
         for ser in S.serial_list:
             if ser.inWaiting() > 0:
+                ser.read()
                 laptop_4d.send_message('/bang', 0)
                 print('IR bang sent')
-                
-                
-            
-            
-
-    
-    
-
-    #main()
