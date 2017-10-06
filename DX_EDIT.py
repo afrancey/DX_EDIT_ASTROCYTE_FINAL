@@ -22,6 +22,12 @@ INSTRUCT_CODE_ACTIVATE_LED = b'\xAA'
 
 COMMAND_BYTE = b'\xff'
 
+my_type = 'master'
+
+class Const():
+    def __init__(self):
+        self.count = 0
+
 
 
 #######################################################################################
@@ -66,43 +72,6 @@ led_pin_dict = {'/sphereUnit1/led1/in':3, '/sphereUnit1/led1/out':4,
             '/sphereUnit12/led2/in':25, '/sphereUnit12/led2/out':32,
             '/sphereUnit12/led3/in':9, '/sphereUnit12/led3/out':10,}
 
-slave_led_pin_dict = {'/slave/sphereUnit1/led1/in':3, '/slave/sphereUnit1/led1/out':4,
-            '/slave/sphereUnit1/led2/in':25, '/slave/sphereUnit1/led2/out':32,
-            '/slave/sphereUnit1/led3/in':9, '/slave/sphereUnit1/led3/out':10,
-            '/slave/sphereUnit2/led1/in':3, '/slave/sphereUnit2/led1/out':4,
-            '/slave/sphereUnit2/led2/in':25, '/slave/sphereUnit2/led2/out':32,
-            '/slave/sphereUnit2/led3/in':9, '/slave/sphereUnit2/led3/out':10,
-            '/slave/sphereUnit3/led1/in':3, '/slave/sphereUnit3/led1/out':4,
-            '/slave/sphereUnit3/led2/in':25, '/slave/sphereUnit3/led2/out':32,
-            '/slave/sphereUnit3/led3/in':9, '/slave/sphereUnit3/led3/out':10,
-            '/slave/sphereUnit4/led1/in':3, '/slave/sphereUnit4/led1/out':4,
-            '/slave/sphereUnit4/led2/in':25, '/slave/sphereUnit4/led2/out':32,
-            '/slave/sphereUnit4/led3/in':9, '/slave/sphereUnit4/led3/out':10,
-            '/slave/sphereUnit5/led1/in':3, '/slave/sphereUnit5/led1/out':4,
-            '/slave/sphereUnit5/led2/in':25, '/slave/sphereUnit5/led2/out':32,
-            '/slave/sphereUnit5/led3/in':9, '/slave/sphereUnit5/led3/out':10,
-            '/slave/sphereUnit6/led1/in':3, '/slave/sphereUnit6/led1/out':4,
-            '/slave/sphereUnit6/led2/in':25, '/slave/sphereUnit6/led2/out':32,
-            '/slave/sphereUnit6/led3/in':9, '/slave/sphereUnit6/led3/out':10,
-            '/slave/sphereUnit7/led1/in':3, '/slave/sphereUnit7/led1/out':4,
-            '/slave/sphereUnit7/led2/in':25, '/slave/sphereUnit7/led2/out':32,
-            '/slave/sphereUnit7/led3/in':9, '/slave/sphereUnit7/led3/out':10,
-            '/slave/sphereUnit8/led1/in':3, '/slave/sphereUnit8/led1/out':4,
-            '/slave/sphereUnit8/led2/in':25, '/slave/sphereUnit8/led2/out':32,
-            '/slave/sphereUnit8/led3/in':9, '/slave/sphereUnit8/led3/out':10,
-            '/slave/sphereUnit9/led1/in':3, '/slave/sphereUnit9/led1/out':4,
-            '/slave/sphereUnit9/led2/in':25, '/slave/sphereUnit9/led2/out':32,
-            '/slave/sphereUnit9/led3/in':9, '/slave/sphereUnit9/led3/out':10,
-            '/slave/sphereUnit10/led1/in':3, '/slave/sphereUnit10/led1/out':4,
-            '/slave/sphereUnit10/led2/in':25, '/slave/sphereUnit10/led2/out':32,
-            '/slave/sphereUnit10/led3/in':9, '/slave/sphereUnit10/led3/out':10,
-            '/slave/sphereUnit11/led1/in':3, '/slave/sphereUnit11/led1/out':4,
-            '/slave/sphereUnit11/led2/in':25, '/slave/sphereUnit11/led2/out':32,
-            '/slave/sphereUnit11/led3/in':9, '/slave/sphereUnit11/led3/out':10,
-            '/slave/sphereUnit12/led1/in':3, '/slave/sphereUnit12/led1/out':4,
-            '/slave/sphereUnit12/led2/in':25, '/slave/sphereUnit12/led2/out':32,
-            '/slave/sphereUnit12/led3/in':9, '/slave/sphereUnit12/led3/out':10,}
-
 
 moth_pin_dict = { '/sphereUnit1/speaker/0':9, '/sphereUnit1/speaker/1':10, '/sphereUnit1/speaker/2': 22,
                   '/sphereUnit1/speaker/3': 23, '/sphereUnit1/speaker/4':29, '/sphereUnit1/speaker/5':30,
@@ -142,45 +111,6 @@ moth_pin_dict = { '/sphereUnit1/speaker/0':9, '/sphereUnit1/speaker/1':10, '/sph
                 '/sphereUnit12/A/7':22, '/sphereUnit12/B/10':6, '/sphereUnit12/C/7':20, '/sphereUnit12/C/8':16,
                 }
 
-slave_moth_pin_dict = { '/slave/sphereUnit1/speaker/0':9, '/slave/sphereUnit1/speaker/1':10, '/slave/sphereUnit1/speaker/2': 22,
-                  '/slave/sphereUnit1/speaker/3': 23, '/slave/sphereUnit1/speaker/4':29, '/slave/sphereUnit1/speaker/5':30,
-                  '/slave/sphereUnit2/speaker/0':9, '/slave/sphereUnit2/speaker/1':10, '/slave/sphereUnit2/speaker/2': 22,
-                  '/slave/sphereUnit2/speaker/3': 23, '/slave/sphereUnit2/speaker/4':29, '/slave/sphereUnit2/speaker/5':30,
-                  '/slave/sphereUnit3/speaker/0':9, '/slave/sphereUnit3/speaker/1':10, '/slave/sphereUnit3/speaker/2': 22,
-                  '/slave/sphereUnit3/speaker/3': 23, '/slave/sphereUnit3/speaker/4':29, '/slave/sphereUnit3/speaker/5':30,
-                  '/slave/sphereUnit4/speaker/0':9, '/slave/sphereUnit4/speaker/1':10, '/slave/sphereUnit4/speaker/2': 22,
-                  '/slave/sphereUnit4/speaker/3': 23, '/slave/sphereUnit4/speaker/4':29, '/slave/sphereUnit4/speaker/5':30,
-                   '/slave/sphereUnit5/speaker/0':9, '/slave/sphereUnit5/speaker/1':10, '/slave/sphereUnit5/speaker/2': 22,
-                  '/slave/sphereUnit5/speaker/3': 23, '/slave/sphereUnit5/speaker/4':29, '/slave/sphereUnit5/speaker/5':30,
-                   '/slave/sphereUnit6/speaker/0':9, '/slave/sphereUnit6/speaker/1':10, '/slave/sphereUnit6/speaker/2': 22,
-                  '/slave/sphereUnit6/speaker/3': 23, '/slave/sphereUnit6/speaker/4':29, '/slave/sphereUnit6/speaker/5':30,
-                   '/slave/sphereUnit7/speaker/0':9, '/slave/sphereUnit7/speaker/1':10, '/slave/sphereUnit7/speaker/2': 22,
-                  '/slave/sphereUnit7/speaker/3': 23, '/slave/sphereUnit7/speaker/4':29, '/slave/sphereUnit7/speaker/5':30,
-                   '/slave/sphereUnit8/speaker/0':9, '/slave/sphereUnit8/speaker/1':10, '/slave/sphereUnit8/speaker/2': 22,
-                  '/slave/sphereUnit8/speaker/3': 23, '/slave/sphereUnit8/speaker/4':29, '/slave/sphereUnit8/speaker/5':30,
-                   '/slave/sphereUnit9/speaker/0':9, '/slave/sphereUnit9/speaker/1':10, '/slave/sphereUnit9/speaker/2': 22,
-                  '/slave/sphereUnit9/speaker/3': 23, '/slave/sphereUnit9/speaker/4':29, '/slave/sphereUnit9/speaker/5':30,
-                   '/slave/sphereUnit10/speaker/0':9, '/slave/sphereUnit10/speaker/1':10, '/slave/sphereUnit10/speaker/2': 22,
-                  '/slave/sphereUnit10/speaker/3': 23, '/slave/sphereUnit10/speaker/4':29, '/slave/sphereUnit10/speaker/5':30,
-                   '/slave/sphereUnit11/speaker/0':9, '/slave/sphereUnit11/speaker/1':10, '/slave/sphereUnit11/speaker/2': 22,
-                  '/slave/sphereUnit11/speaker/3': 23, '/slave/sphereUnit11/speaker/4':29, '/slave/sphereUnit11/speaker/5':30,
-                  '/slave/sphereUnit12/speaker/0':9, '/slave/sphereUnit12/speaker/1':10, '/slave/sphereUnit12/speaker/2': 22,
-                  '/slave/sphereUnit12/speaker/3': 23, '/slave/sphereUnit12/speaker/4':29, '/slave/sphereUnit12/speaker/5':30,
-                        
-                  '/slave/sphereUnit1/A/7':22, '/slave/sphereUnit1/B/10':6, '/slave/sphereUnit1/C/7':20, '/slave/sphereUnit1/C/8':16,
-                '/slave/sphereUnit2/A/7':22, '/slave/sphereUnit2/B/10':6, '/slave/sphereUnit2/C/7':20, '/slave/sphereUnit2/C/8':20,
-                '/slave/sphereUnit3/A/7':22, '/slave/sphereUnit3/B/10':6, '/slave/sphereUnit3/C/7':20, '/slave/sphereUnit3/C/8':16,
-                '/slave/sphereUnit4/A/7':22, '/slave/sphereUnit4/B/10':6, '/slave/sphereUnit4/C/7':20, '/slave/sphereUnit4/C/8':16,
-                '/slave/sphereUnit5/A/7':22, '/slave/sphereUnit5/B/10':6, '/slave/sphereUnit5/C/7':20, '/slave/sphereUnit5/C/8':20,
-                '/slave/sphereUnit6/A/7':22, '/slave/sphereUnit6/B/10':6, '/slave/sphereUnit6/C/7':20, '/slave/sphereUnit6/C/8':16,
-                '/slave/sphereUnit7/A/7':22, '/slave/sphereUnit7/B/10':6, '/slave/sphereUnit7/C/7':20, '/slave/sphereUnit7/C/8':16,
-                '/slave/sphereUnit8/A/7':22, '/slave/sphereUnit8/B/10':6, '/slave/sphereUnit8/C/7':20, '/slave/sphereUnit8/C/8':20,
-                '/slave/sphereUnit9/A/7':22, '/slave/sphereUnit9/B/10':6, '/slave/sphereUnit9/C/7':20, '/slave/sphereUnit9/C/8':16,
-                '/slave/sphereUnit10/A/7':22, '/slave/sphereUnit10/B/10':6, '/slave/sphereUnit10/C/7':20, '/slave/sphereUnit10/C/8':16,
-                '/slave/sphereUnit11/A/7':22, '/slave/sphereUnit11/B/10':6, '/slave/sphereUnit11/C/7':20, '/slave/sphereUnit11/C/8':20,
-                '/slave/sphereUnit12/A/7':22, '/slave/sphereUnit12/B/10':6, '/slave/sphereUnit12/C/7':20, '/slave/sphereUnit12/C/8':16,
-                        
-                }
 
 
 RPi_s2 = [1,2,3] #master
@@ -197,9 +127,14 @@ laptop_4d_ip = '1.2.3.4'
 
 if __name__ == '__main__':
 
+    const = Const()
+
     # OSC handlers
     def led_handler_master(addr, value):
+
         print("addr: " + addr)
+        const.count += 1
+        print("count: " + str(const.count))
 
         # parse unit number from address
         s = addr[addr.index('Unit') + 4:]
@@ -207,7 +142,26 @@ if __name__ == '__main__':
         
         pin = led_pin_dict[addr]
 
-        if unit in RPi_s2:
+        if my_type == 'master':
+            if unit in RPi_s2:
+                teensy_number = unit - 1 + 12
+                for ser in S.serial_list:
+                    print('sending: ' + str(teensy_number) + ', ' + str(pin) + ', ' + str(value))
+                    ser.write(COMMAND_BYTE)
+                    ser.write(bytes([teensy_number]))
+                    ser.write(bytes([pin]))
+                    ser.write(bytes([value]))
+                print('serial message sent')
+            elif unit in RPi_s5:
+                slave_s5.send_message(addr, value)
+                print('OSC message sent')
+            elif unit in RPi_s8:
+                slave_s8.send_message(addr, value)
+                print('OSC message sent')
+            elif unit in RPi_s11:
+                slave_s11.send_message(addr, value)
+                print('OSC message sent')
+        else:
             teensy_number = unit - 1 + 12
             for ser in S.serial_list:
                 print('sending: ' + str(teensy_number) + ', ' + str(pin) + ', ' + str(value))
@@ -216,35 +170,8 @@ if __name__ == '__main__':
                 ser.write(bytes([pin]))
                 ser.write(bytes([value]))
             print('serial message sent')
-        elif unit in RPi_s5:
-            slave_s5.send_message('/slave' + addr, value)
-            print('OSC message sent')
-        elif unit in RPi_s8:
-            slave_s8.send_message('/slave' + addr, value)
-            print('OSC message sent')
-        elif unit in RPi_s11:
-            slave_s11.send_message('/slave' + addr, value)
-            print('OSC message sent')
             
             
-
-    def led_handler_slave(addr, value):
-        print("addr: " + addr)
-        
-        # parse unit number from address
-        s = addr[addr.index('Unit') + 4:]
-        unit = int(s[:s.index('/')])
-
-        pin = slave_led_pin_dict[addr]
-        teensy_number = unit - 1 + 12
-        for ser in S.serial_list:
-            print('sending: ' + str(teensy_number) + ', ' + str(pin) + ', ' + str(value))
-            ser.write(COMMAND_BYTE)
-            ser.write(bytes([teensy_number]))
-            ser.write(bytes([pin]))
-            ser.write(bytes([value]))
-        print('serial message sent')
-
 
 
     def moth_handler_master(addr, value):
@@ -256,7 +183,27 @@ if __name__ == '__main__':
         
         pin = moth_pin_dict[addr]
 
-        if unit in RPi_s2:
+        if my_type == 'master':
+            if unit in RPi_s2:
+                teensy_number = unit - 1
+                for ser in S.serial_list:
+                    print('sending: ' + str(teensy_number) + ', ' + str(pin) + ', ' + str(value))
+                    ser.write(COMMAND_BYTE)
+                    ser.write(bytes([teensy_number]))
+                    ser.write(bytes([pin]))
+                    ser.write(bytes([value]))
+                print('serial message sent')
+            elif unit in RPi_s5:
+                slave_s5.send_message(addr, value)
+                print('OSC message sent')
+            elif unit in RPi_s8:
+                slave_s8.send_message(addr, value)
+                print('OSC message sent')
+            elif unit in RPi_s11:
+                slave_s11.send_message(addr, value)
+                print('OSC message sent')
+
+        else:
             teensy_number = unit - 1
             for ser in S.serial_list:
                 print('sending: ' + str(teensy_number) + ', ' + str(pin) + ', ' + str(value))
@@ -265,69 +212,37 @@ if __name__ == '__main__':
                 ser.write(bytes([pin]))
                 ser.write(bytes([value]))
             print('serial message sent')
-        elif unit in RPi_s5:
-            slave_s5.send_message('/slave' + addr, value)
-            print('OSC message sent')
-        elif unit in RPi_s8:
-            slave_s8.send_message('/slave' + addr, value)
-            print('OSC message sent')
-        elif unit in RPi_s11:
-            slave_s11.send_message('/slave' + addr, value)
-            print('OSC message sent')
             
             
-
-    def moth_handler_slave(addr, value):
-        print("addr: " + addr)
-        
-        # parse unit number from address
-        s = addr[addr.index('Unit') + 4:]
-        unit = int(s[:s.index('/')])
-
-        # parse led number
-        pin = slave_moth_pin_dict[addr]
-        teensy_number = unit - 1
-        for ser in S.serial_list:
-            print('sending: ' + str(teensy_number) + ', ' + str(pin) + ', ' + str(value))
-            ser.write(COMMAND_BYTE)
-            ser.write(bytes([teensy_number]))
-            ser.write(bytes([pin]))
-            ser.write(bytes([value]))
-        print('serial message sent')
         
                 
     dispatcher = dispatcher.Dispatcher()
 
     for key in led_pin_dict.keys():       
         dispatcher.map(key, led_handler_master)
-        
-    for key in slave_led_pin_dict.keys():         
-        dispatcher.map(key, led_handler_slave)
 
     for key in moth_pin_dict.keys():          
         dispatcher.map(key, moth_handler_master)
         
-    for key in slave_moth_pin_dict.keys():     
-        dispatcher.map(key, moth_handler_slave)
 
-    OSC_listener = osc_server.BlockingOSCUDPServer(('0.0.0.0', 3001), dispatcher)
+    OSC_listener = osc_server.BlockingOSCUDPServer(('0.0.0.0', 3005), dispatcher)#3001), dispatcher)
     OSC_listener_thread = threading.Thread(target=OSC_listener.serve_forever)
     OSC_listener_thread.start()
 
     # OSC outputs
-    slave_s5 = udp_client.SimpleUDPClient(s5_ip, 3001)
-    slave_s8 = udp_client.SimpleUDPClient(s8_ip, 3001)
-    slave_s11 = udp_client.SimpleUDPClient(s11_ip, 3001)
+    slave_s5 = udp_client.SimpleUDPClient(s5_ip, 3005)#3001)
+    slave_s8 = udp_client.SimpleUDPClient(s8_ip, 3005)#3001)
+    slave_s11 = udp_client.SimpleUDPClient(s11_ip, 3005)#3001)
     laptop_4d = udp_client.SimpleUDPClient(laptop_4d_ip, 3000)
     
 
     print("Starting Main Program")
 
-    count = 0
-
-    while True:
-        for ser in S.serial_list:
-            if ser.inWaiting() > 0:
-                ser.read()
-                laptop_4d.send_message('/bang', 0)
-                print('IR bang sent')
+    ## Interrupts OSC control, don't use
+##    while True:
+##        pass
+##        for ser in S.serial_list:
+##            if ser.inWaiting() > 0:
+##                ser.read()
+##                laptop_4d.send_message('/bang', 0)
+##                print('IR bang sent')
