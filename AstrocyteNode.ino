@@ -20,9 +20,10 @@ int sampling_rate = 100;
 long last_sample_time = millis();
 int IR_pin = 17;
 int IR_threshold = 1100;
+bool IR_sampling_on = false;
 
 long last_message_time = millis();
-long idle_wait_time = 20000; //2 seconds
+long idle_wait_time = 30000; //2 seconds
 bool idle_state = false;
 int idle_state_stage = 0;
 int max_brightness = 50;
@@ -32,7 +33,7 @@ long last_stage_change = millis();
 long idle_random_light = random(3);
 long idle_random_moth_1 = random(6);
 long idle_random_moth_2 = random(6);
-bool idling_on = false;
+bool idling_on = true;
 
 // Teensy ID
 // filled with read_EE(), read_teensyID()
@@ -140,10 +141,12 @@ void loop() {
 
     }
 
-    if (my_number == 1 || my_number == 4 || my_number == 7 || my_number == 10){
-      IR_val = analogRead(IR_pin);
-      if (IR_val > IR_threshold){
-        Serial.write(0xff);
+    if (IR_sampling_on){
+      if (my_number == 1 || my_number == 4 || my_number == 7 || my_number == 10){
+        IR_val = analogRead(IR_pin);
+        if (IR_val > IR_threshold){
+          Serial.write(0xff);
+        }
       }
     }
 
