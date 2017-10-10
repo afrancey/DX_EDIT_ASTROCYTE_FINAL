@@ -80,7 +80,9 @@ void setup() {
 
 void loop() {
 
-
+  // IDLE BEHAVIOUR
+  // if no message has been received before idle_wait_time milliseconds have passed
+  // chooses random lights and moths, fades in and out
   if (millis() - last_message_time > idle_wait_time && idling_on){
     if (millis() - last_stage_change > idle_rate){
       last_stage_change = millis();
@@ -104,7 +106,6 @@ void loop() {
         idle_increasing = false;
       }
       
-  
       if (idle_increasing){
         idle_state_stage++;
       } else {
@@ -118,8 +119,13 @@ void loop() {
   uint8_t incomingByte;
   uint8_t commandByte = 0xff;
   int IR_val;
-  
 
+  // COMMAND STRUCTURE
+  // <commandByte><incomingNumber><incomingPin><incomingValue>
+
+  // checks to see if incomingNumber matches my number
+  // then sets pin specified by incomingPin
+  // to value specified by incomingValue
   if (Serial.available() > 3 && serial_on){
     
     incomingByte = Serial.read();
@@ -128,7 +134,7 @@ void loop() {
 
       uint8_t incomingNumber = Serial.read();
       uint8_t incomingPin = Serial.read();
-      uint8_t testpin = 0x19;
+      //uint8_t testpin = 0x19;
       uint8_t incomingValue = Serial.read();
 
       if (incomingNumber == my_number){
@@ -141,6 +147,7 @@ void loop() {
 
     }
 
+    // sends a bang to Raspberry Pi if the IR sensor has been triggered
     if (IR_sampling_on){
       if (my_number == 1 || my_number == 4 || my_number == 7 || my_number == 10){
         IR_val = analogRead(IR_pin);
@@ -179,11 +186,13 @@ long int read_teensyID() {
   return myID;
 }
 
+// returns unique enumerated Teensy number
+// Teensy number is 0-11 for center spars
+// and 12-23 for perimeter spars
+// in order of their sphere units
 int get_my_number(long int myID){
   uint8_t my_number;
-  uint8_t my_type;
 
-  // first check centre spars
   for (uint8_t unit = 0x00; unit < NumSphereUnits; unit+= 0x01){
     if (center_teensy_identifiers[unit] == myID){
       my_number = unit;
@@ -198,6 +207,9 @@ int get_my_number(long int myID){
   return my_number;
 }
 
+// returns node type
+// my_type = 0 for center nodes
+// my_type = 1 for perimeter nodes
 int get_my_type(long int myID){
   int my_type;
 
@@ -216,6 +228,9 @@ int get_my_type(long int myID){
   return my_type;
 }
 
+
+// Chooses hard or soft PWM
+// while limiting maximum value
 void safe_write(uint8_t incomingPin, uint8_t val){
 
   uint8_t incomingValue;
