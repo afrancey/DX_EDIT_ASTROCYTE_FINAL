@@ -13,28 +13,28 @@ from pythonosc import udp_client
 from pythonosc import dispatcher
 from pythonosc import osc_server
 
+# NodeSerial will open 6 serial ports for you
 S = NodeSerial.NodeSerial()
 
-#Instruction Message Codes
-INSTRUCT_CODE_GET_TEENSY_ID = b'\x00'
-INSTRUCT_CODE_ACTIVATE_LED = b'\xAA'
-##INSTRUCT_CODE_PLAY_SD_WAV = b'\x0F'
-
+# the first byte in command structure
+# signifies that next 3 bytes are a message
 COMMAND_BYTE = b'\xff'
 
+# Raspberry Pi type
+# my_type = 'master' for master Raspberry Pi (external networked machines
+#                                             can send OSC messages to IP address
+#                                             of master Pi)
+# my_type = 'slave' for slave Raspberry Pi (master sends OSC commands to slaves)
 my_type = 'master'
 
+# counter used for counting messages later on
 class GlobalVariable():
     def __init__(self):
         self.count = 0
 
 
-
-#######################################################################################
-#Main Function Globals
-#######################################################################################
-
-
+# OSC addresses for each LED with pin numbers
+# led_pin_dict[addr] = Teensy pin number for LED specified by that address
 led_pin_dict = {'/sphereUnit1/led1/in':3, '/sphereUnit1/led1/out':4,
             '/sphereUnit1/led2/in':25, '/sphereUnit1/led2/out':32,
             '/sphereUnit1/led3/in':9, '/sphereUnit1/led3/out':10,
@@ -72,7 +72,8 @@ led_pin_dict = {'/sphereUnit1/led1/in':3, '/sphereUnit1/led1/out':4,
             '/sphereUnit12/led2/in':25, '/sphereUnit12/led2/out':32,
             '/sphereUnit12/led3/in':9, '/sphereUnit12/led3/out':10,}
 
-
+# OSC addresses for each moth with pin numbers
+# moth_pin_dict[addr] = Teensy pin number for moth specified by that address
 moth_pin_dict = { '/sphereUnit1/speaker/0':9, '/sphereUnit1/speaker/1':10, '/sphereUnit1/speaker/2': 22,
                   '/sphereUnit1/speaker/3': 23, '/sphereUnit1/speaker/4':29, '/sphereUnit1/speaker/5':30,
                   '/sphereUnit2/speaker/0':9, '/sphereUnit2/speaker/1':10, '/sphereUnit2/speaker/2': 22,
@@ -112,29 +113,50 @@ moth_pin_dict = { '/sphereUnit1/speaker/0':9, '/sphereUnit1/speaker/1':10, '/sph
                 }
 
 
-
+# Sphere chunks
+# RPi_s# = list of sphere units attached to RPi on sphere unit #
 RPi_s2 = [1,2,3] #master
 RPi_s5 = [4,5,6] #slave
 RPi_s8 = [7,8,9] #slave
 RPi_s11 = [10,11,12] #slave
 
+# IP addresses corresponding to each Raspberry Pi
 s5_ip = '10.1.19.12'
 s8_ip = '10.1.19.16'
 s11_ip = '10.1.19.17'
 
-
+# 4D laptop IP address
+# not used
 laptop_4d_ip = '1.2.3.4'
 
 if __name__ == '__main__':
 
     global_variable = GlobalVariable()
 
-    # OSC handlers
+    ###
+    ### OSC handlers ###
+    ###
+
+    # Checks to see if the incoming OSC address is meant for the master
+    # if so, sends a sequence of bytes to each node to actuate the LED or moth
+
+    # COMMAND STRUCTURE
+    # <COMMAND_BYTE><teensy number><pin><value>
+    # effect: sets the pin on teensy_number to value
+
+    # NODE ENUMERATION (teensy_number)
+    # Each node is assigned a unique number from 0-23
+    # With 0-11 denoting central nodes in order of their sphere units
+    # and 12-23 denoting peripheral nodes in order of their sphere units
+    
+
+    # if message is for slave,
+    # forward the OSC message to the appropriate Raspberry Pi
     def led_handler_master(addr, value):
 
         print("addr: " + addr)
-        global_variable.count += 1
-        print("count: " + str(global_variable.count))
+        #global_variable.count += 1
+        #print("count: " + str(global_variable.count))
 
         # parse unit number from address
         s = addr[addr.index('Unit') + 4:]
@@ -215,9 +237,13 @@ if __name__ == '__main__':
             
             
         
-                
+    # OSC message dispatcher
+    # maps functions to OSC addresses
     dispatcher = dispatcher.Dispatcher()
 
+    # add all addresses to dispatcher with respective function
+    # note for future: just make a handler with the '?' OSC identifier
+    # to catch all addresses in one dispatcher function
     for key in led_pin_dict.keys():       
         dispatcher.map(key, led_handler_master)
 
@@ -225,7 +251,13 @@ if __name__ == '__main__':
         dispatcher.map(key, moth_handler_master)
         
 
+    # Initialize blocking OSC server
+    # will process OSC messages sequentially
+    # For laptop control: port 3005
+    # For 4D Engine control: port 3001
     OSC_listener = osc_server.BlockingOSCUDPServer(('0.0.0.0', 3005), dispatcher)#3001), dispatcher)
+
+    # start server on its own thread
     OSC_listener_thread = threading.Thread(target=OSC_listener.serve_forever)
     OSC_listener_thread.start()
 
