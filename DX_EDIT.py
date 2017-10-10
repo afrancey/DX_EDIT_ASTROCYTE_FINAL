@@ -24,7 +24,7 @@ COMMAND_BYTE = b'\xff'
 
 my_type = 'master'
 
-class Const():
+class GlobalVariable():
     def __init__(self):
         self.count = 0
 
@@ -127,14 +127,14 @@ laptop_4d_ip = '1.2.3.4'
 
 if __name__ == '__main__':
 
-    const = Const()
+    global_variable = GlobalVariable()
 
     # OSC handlers
     def led_handler_master(addr, value):
 
         print("addr: " + addr)
-        const.count += 1
-        print("count: " + str(const.count))
+        global_variable.count += 1
+        print("count: " + str(global_variable.count))
 
         # parse unit number from address
         s = addr[addr.index('Unit') + 4:]
